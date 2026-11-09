@@ -1,0 +1,7 @@
+interface:
+  display_name: "粉红小鸟 · IndexTTS 配音"
+  short_description: "通过本机 IndexTTS2.5 生成参考音色配音、情感语音与 WAV 音频"
+  icon_small: "./assets/icon.png"
+  icon_large: "./assets/logo.png"
+  brand_color: "#F277A4"
+  default_prompt: "用 $indextts 把我的文字制作成本地中文配音，并提供试听。"

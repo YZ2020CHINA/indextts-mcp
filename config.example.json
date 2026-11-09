@@ -1,0 +1,8 @@
+{
+  "tts_root": "D:\\IndexTTS2.5",
+  "port": 17865,
+  "half_precision": true,
+  "use_qwen_emo": false,
+  "max_queue": 4,
+  "max_text_chars": 5000
+}

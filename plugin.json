@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "pink-bird-indextts",
+  "version": "1.2.0",
+  "description": "粉红小鸟：通过本机 IndexTTS2.5 进行参考音色文字转语音与情感配音。",
+  "author": {
+    "name": "Local IndexTTS integration"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "粉红小鸟 · IndexTTS",
+        "shortDescription": "本地文字转语音、参考音色与情感配音",
+        "longDescription": "连接已有 IndexTTS2.5 安装。包含八个 MCP 工具和中文配音 skill，支持命名音色注册、WebUI预设发现、发音注解、情感控制、语速与分段静音、异步阶段进度及WAV交付。",
+        "developerName": "Local IndexTTS integration",
+        "category": "Creativity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "brandColor": "#F277A4",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png",
+        "defaultPrompt": [
+          "用粉红小鸟把这段文字转成中文配音。",
+          "用我的参考音频制作一段平静的旁白。"
+        ]
+      }
+    }
+  },
+  "license": "MIT"
+}
