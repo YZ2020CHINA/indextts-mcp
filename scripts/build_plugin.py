@@ -12,6 +12,17 @@ sys.path.insert(0,str(ROOT))
 from common import atomic_json, VERSION
 
 
+def write_launcher(plugin, command, args, env=None):
+    """Codex plugin stdio servers must use a bare executable, so absolute paths live in a launcher."""
+    def quote(value):
+        return '"' + str(value).replace('%', '%%') + '"'
+    lines = ['@echo off', 'chcp 65001 >nul']
+    lines += ['set "{}={}"'.format(key, str(value).replace('%', '%%')) for key, value in (env or {}).items()]
+    lines.append(' '.join(quote(part) for part in [command, *args]))
+    (plugin / 'launch-mcp.cmd').write_text('\r\n'.join(lines) + '\r\n', encoding='utf-8')
+    return {'type': 'stdio', 'command': 'cmd.exe', 'args': ['/d', '/s', '/c', 'call', './launch-mcp.cmd'], 'cwd': './'}
+
+
 def build(python=None):
     for name in ('config', 'voices'):
         target=ROOT/(name+'.json')
@@ -39,15 +50,13 @@ def build(python=None):
         shutil.copyfile(source,target)
     atomic_json(plugin/'mcp.json',{
         '$schema':'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',
-        'mcpServers':{'indextts':{'type':'stdio','command':str(executable),
-          'args':['-u',str(plugin/'server.py')],
-          'env':{'INDEXTTS_MCP_HOME':str(ROOT),'PYTHONUTF8':'1'},
-          'startup_timeout_sec':30,'tool_timeout_sec':30}}})
+        'mcpServers':{'indextts':write_launcher(plugin,executable,['-u',str(plugin/'server.py')],
+          {'INDEXTTS_MCP_HOME':str(ROOT),'PYTHONUTF8':'1'})}})
     atomic_json(ROOT/'.agents/plugins/marketplace.json',{
         'name':'pink-bird-local','interface':{'displayName':'粉红小鸟 · 本地语音'},
         'plugins':[{'name':'pink-bird-indextts','source':{'source':'local','path':'./plugins/pink-bird-indextts'},
                     'policy':{'installation':'AVAILABLE','authentication':'ON_INSTALL'},'category':'Creativity'}]})
-    plugin_files=[plugin/p.relative_to(ROOT) for p in sources]+[plugin/'mcp.json']
+    plugin_files=[plugin/p.relative_to(ROOT) for p in sources]+[plugin/'mcp.json',plugin/'launch-mcp.cmd']
     hashes={p.relative_to(plugin).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(plugin_files)}
     atomic_json(plugin/'build-info.json',{'version':VERSION,'files':hashes})
     files=[ROOT/f for f in ('LICENSE','THIRD_PARTY_NOTICES.md','voices.example.json','config.example.json','plugin.json','server.py','backend.py','common.py','voices.json','config.json','install-plugin.ps1','README.md','VALIDATION.md','.gitignore')]
